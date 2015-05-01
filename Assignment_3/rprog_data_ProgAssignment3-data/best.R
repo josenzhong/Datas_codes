@@ -1,6 +1,7 @@
 best <- function(state, outcome) {
         ## Read outcome data
-        outcome.complete <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
+        outcome.complete <- read.csv("outcome-of-care-measures.csv", 
+                                     colClasses = "character")
         
         ## Create a dateset with only the necessary columns
         outcome.short <- cbind(
@@ -33,21 +34,30 @@ best <- function(state, outcome) {
 
         } else {
                ## Create a subset with only the selected state 
-               outcome.state <- subset(outcome.short, State == "TX")
+               outcome.state <- subset(outcome.short, State == "MD")
                
-               ## Exclude the row with the missing value of the underlying "outcome"
-               attach(outcome.state)
-               pneumonia[pneumonia == "Not Available"] <- NA
-               outcome.state <- na.omit(outcome.state)
-               detach(outcome.state)
+               ## Mark all missing values as NA
+               outcome.state[outcome.state == "Not Available"] <- NA
+               
+               ## Create a temp dataset with only the Hospital
+               ## and underlying outcome veriables
+               temp <- cbind(as.character(outcome.state$Hospital), 
+                             as.numeric(outcome.state$pneumonia))
+               
+               ## Convert the temp from a matrix into a data frame
+               temp <- as.data.frame(temp)
+               
+               ## Rename the column of temp
+               colnames(temp) <- c("Hospital", "pneumonia")
+               
+               ## Omit the missing value
+               temp.complete <- na.omit(temp)
                
                ## Stort the hospital names in alphabetical order
-               attach(outcome.state)
-               outcome.state.order <- outcome.state[order(pneumonia, Hospital), ]
-               detach(outcome.state)
+               temp.order <- temp.complete[order(temp.complete[2], temp.complete[1]), ]
                
                ## Choose the first hospital in outcome.state.order
-               x <- outcome.state.order$Hospital[1]
+               x <- temp.order[, "Hospital"][1]
                print(x)
         }
         
