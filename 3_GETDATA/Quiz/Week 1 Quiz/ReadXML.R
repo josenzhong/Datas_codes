@@ -1,0 +1,11 @@
+library(XML)
+library(RCurl)
+fileURL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
+xData <- getURL(fileURL)
+doc <- xmlParse(xData)
+rootNode <- xmlRoot(doc)
+xmlName(rootNode)
+zipcode <- as.data.frame(as.numeric(xpathSApply(rootNode,"//zipcode", xmlValue)))
+colnames(zipcode) = c("Zip")
+sub <- subset(zipcode, zipcode$Zip == 21231)
+nrow(sub)
